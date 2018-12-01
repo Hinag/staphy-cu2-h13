@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import matplotlib.animation as animation
 import random
-#import time
 
 class grid:
     """Klasse für Spin-Gitter"""
@@ -24,17 +23,11 @@ class grid:
         self.lattice = 2 * self.lattice - 1
         self.h = 0
         self.tau = 1
+        return
 
     def print_settings(self):
         print("Gittergröße: ",self.xdim, "x",self.ydim)
         print(self.lattice)
-
-#   def random(self): # langsam und keinen zweck fuer aufgabe?
-#       array = np.zeros((8,8))
-#       for x in range(8):
-#           for y in range(8):
-#               array[x,y] = random.randint(-0,1)
-#       return(array)
 
     def update(self):
         """wendet den Metropolis Algorithmus auf das Gitter an und gibt es zurück"""
@@ -58,28 +51,41 @@ class grid:
             probability = np.exp(-energy_delta / self.tau)
             if(random.random() < probability):
                 self.lattice[x_rand][y_rand] = new
-
         return
 
     def make_plot(self):
         self.fig = plt.figure()
-        #ax = self.fig.add_subplot(111)
-        #self.fig.subplots_adjust(left=0.25, bottom=0.25)
-        #temp_slider_ax = self.fig.add_axes([0.25, 0.15, 0.65, 0.03], axisbg="red")
-        #temp_slider = Slider(temp_slider_ax, 'Temp.', 0.1, 10.0, valinit=0)
-        #[data] = ax.arrow(0,0,1,1, linewidth=2, color='red')
+
+        ax = self.fig.add_subplot(111)
+        self.fig.subplots_adjust(bottom=0.2)
         im = plt.matshow(self.lattice, fignum=0, animated=True)
+        ax_tau = plt.axes([0.2, 0.11, 0.6, 0.03])
+        sli_tau = Slider(ax_tau, 'Temp', 0.01, 50.0, valinit=1.)
+        ax_h = plt.axes([0.2, 0.06, 0.6, 0.03])
+        sli_h = Slider(ax_h, 'h', -5., 5., valinit=0.)
 
         def update_fig(*args):
+            self.tau = sli_tau.val
+            self.h = sli_h.val
+
             self.update()
+            self.update()
+            self.update()
+            self.update()
+            self.update()
+            self.update()
+            self.update()
+            self.update()
+
             im.set_array(self.lattice)
             return im,
 
 
         ani = animation.FuncAnimation(self.fig, update_fig, interval=0, blit=True)
         plt.show()
+        return
 
-dim =34
+dim = 64
 gitter = grid(dim, dim)
 gitter.print_settings()
 gitter.make_plot()
