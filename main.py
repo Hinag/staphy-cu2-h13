@@ -4,7 +4,7 @@
 """
 Daniel Scheiermann   3227680
 Felix Springer       10002537
-Hinnerk
+Hinnerk              10002310
 """
 
 import numpy as np
