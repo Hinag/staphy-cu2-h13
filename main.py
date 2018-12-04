@@ -25,6 +25,7 @@ class grid:
         self.h = 0 # magnetic field
         self.tau = 1 # temperature
         self.speed = 1 # speed of time progression
+        self.time = 0 # time step
         return
 
     def print_settings(self):
@@ -35,6 +36,8 @@ class grid:
 
     def update(self):
         """uses the metropolis algorithm on the lattice (1 time step)"""
+        self.time += 1
+
         x_rand = random.randint(0, self.xdim - 1)
         y_rand = random.randint(0, self.ydim - 1)
 
@@ -65,7 +68,7 @@ class grid:
         self.fig.subplots_adjust(bottom=0.2)
         im = plt.matshow(self.lattice, fignum=0, animated=True)
         ax_tau = plt.axes([0.2, 0.13, 0.6, 0.03])
-        sli_tau = Slider(ax_tau, 'Temp', 0.01, 50.0, valinit=1.)
+        sli_tau = Slider(ax_tau, 'Temp', 0.01, 30.0, valinit=1.)
         ax_h = plt.axes([0.2, 0.08, 0.6, 0.03])
         sli_h = Slider(ax_h, 'h', -5., 5., valinit=0.)
         ax_speed = plt.axes([0.2, 0.03, 0.6, 0.03])
@@ -88,7 +91,22 @@ class grid:
         plt.show()
         return
 
-dim = 64
-gitter = grid(dim, dim)
-gitter.print_settings()
-gitter.make_plot()
+    def correlation_add(self, row, distance):
+        """returns the sum of the correlation function (still needs '/ time'"""
+        cor = 0
+        for i in range(self.ydim):
+            cor += self.lattice[row][i] * self.lattice[row][i - distance]
+        cor = cor / (self.ydim)
+        return cor
+
+    def correlation_plot(self, tau, steps, updatesteps):
+        self.tau = tau
+        cor_of_dist = np.zeros(self.ydim)
+        for i in range(steps):
+            for j in range(updatesteps):
+                self.update()
+            for j in range(self.ydim):
+                cor_of_dist[j] += self.correlation_add(row=32, distance=j)
+
+        cor_of_dist = cor_of_dist / self.time
+        return cor_of_dist
